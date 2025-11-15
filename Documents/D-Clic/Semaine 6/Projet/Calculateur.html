@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calculateur de prêt hypothécaire</title>
+        <style>
+            body {
+                padding: 40px;
+                margin: 50px;
+                text-align: center;
+                background-color: antiquewhite;
+            }
+
+            .error-message {
+                color: red;
+                font-size: 14px;
+                margin-top: 5px;
+            }
+            .input-group {
+                margin-bottom: 15px;
+            }
+            input:invalid {
+                border-color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Prêt hypothécaire</h1>
+        <form action="" method="get" id="mortgageForm">
+            <div class="input-group">
+                <label for="loanAmount">Montant du prêt (€):</label>
+                <input type="number" id="loanAmount" name="loanAmount" required min="1000" max="10000000" step="1000">
+                <div id="loanAmountError" class="error-message"></div>
+            </div>
+
+            <div class="input-group">
+                <label for="interestRate">Taux d'intérêt (% annuel):</label>
+                <input type="number" step="0.01" id="interestRate" name="interestRate" required min="0.01" max="20">
+                <div id="interestRateError" class="error-message"></div>
+            </div>
+
+            <div class="input-group">
+                <label for="loanTerm">Durée du prêt (années):</label>
+                <input type="number" id="loanTerm" name="loanTerm" required min="1" max="40">
+                <div id="loanTermError" class="error-message"></div>
+            </div>
+
+            <button type="button" onclick="calculateMortgage()">Calculer le paiement mensuel</button>
+        </form>
+        <p id="result" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></p>
+        <script>
+            // Fonction pour effacer tous les messages d'erreur
+            function clearErrors() {
+                document.querySelectorAll('.error-message').forEach(element => {
+                    element.textContent = '';
+                });
+                document.getElementById('result').innerHTML = '';
+            }
+
+            // Fonction de validation des entrées
+            function validateInputs() {
+                clearErrors();
+                let isValid = true;
+
+                // Validation du montant du prêt
+                const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+                if (isNaN(loanAmount) || loanAmount < 1000 || loanAmount > 10000000) {
+                    document.getElementById('loanAmountError').textContent = 
+                        'Le montant du prêt doit être entre 1 000 € et 10 000 000 €';
+                    isValid = false;
+                }
+
+                // Validation du taux d'intérêt
+                const interestRate = parseFloat(document.getElementById('interestRate').value);
+                if (isNaN(interestRate) || interestRate <= 0 || interestRate > 20) {
+                    document.getElementById('interestRateError').textContent = 
+                        'Le taux d\'intérêt doit être entre 0.01% et 20%';
+                    isValid = false;
+                }
+
+                // Validation de la durée du prêt
+                const loanTerm = parseInt(document.getElementById('loanTerm').value);
+                if (isNaN(loanTerm) || loanTerm < 1 || loanTerm > 40) {
+                    document.getElementById('loanTermError').textContent = 
+                        'La durée du prêt doit être entre 1 et 40 ans';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function calculateMortgage() {
+                if (!validateInputs()) {
+                    return;
+                }
+
+                try {
+                    const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+                    const annualInterestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+                    const loanTermYears = parseInt(document.getElementById('loanTerm').value);
+
+                    const monthlyInterestRate = annualInterestRate / 12;
+                    const numberOfPayments = loanTermYears * 12;
+
+                    const monthlyPayment = (loanAmount * monthlyInterestRate) / 
+                        (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+
+                    if (!isFinite(monthlyPayment) || isNaN(monthlyPayment)) {
+                        throw new Error('Le calcul a produit un résultat invalide');
+                    }
+
+                        // Formatage du nombre avec séparateurs de milliers
+                        const formattedPayment = new Intl.NumberFormat('fr-FR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }).format(monthlyPayment);
+
+                        document.getElementById('result').innerHTML = `Le paiement mensuel est de ${formattedPayment} €`;
+                } catch (error) {
+                    document.getElementById('result').innerHTML = `<span style="color: red">Erreur de calcul : ${error.message}</span>`;
+                }
+            }
+
+            // Ajout des écouteurs d'événements pour la validation en temps réel
+            document.getElementById('loanAmount').addEventListener('input', validateInputs);
+            document.getElementById('interestRate').addEventListener('input', validateInputs);
+            document.getElementById('loanTerm').addEventListener('input', validateInputs);
+        </script>
+    </body>
+</html>
