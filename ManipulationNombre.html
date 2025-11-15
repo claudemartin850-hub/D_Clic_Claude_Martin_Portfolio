@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Manipulation de nombres</title>
+        <style>
+            body {
+                padding: 20px 40px;
+                background-color: darkgray;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Manipulation de nombres</h1>
+        <form action="" method="get" id="number">
+            <label for="numberInput">Veuillez entrer un nombre :</label>
+            <input type="number" name="number" id="numberInput" />
+            <button type="submit">Envoyer</button>
+        </form>
+
+        <div style="margin-top:0.6rem;">
+            <label for="numberAleatoire">Nombre aléatoire</label>
+            <input type="button" value="Générer" id="numberAleatoire" />
+        </div>
+
+        <p id="randomResult" aria-live="polite" style="margin-top:0.25rem;color:#006"></p>
+        <p id="RacineCarrée" aria-live="polite" style="margin-top:0.5rem;color:#b00"></p>
+        <script>
+            document.getElementById('number').addEventListener('submit', function(e) {
+                e.preventDefault();
+                afficheInfos();
+            });
+
+            // Bouton générer : affiche un nombre aléatoire
+            document.getElementById('numberAleatoire').addEventListener('click', function() {
+                const min = 0, max = 100;
+                const rand = Math.floor(Math.random() * (max - min + 1)) + min;
+                const out = document.getElementById('randomResult');
+                if (out) {
+                    out.textContent = `Nombre aléatoire : ${rand}`;
+                    out.style.color = '#006';
+                }
+            });
+
+            function afficheInfos() {
+                const numberValue = parseFloat(document.getElementById('numberInput').value);
+                const racineEl = document.getElementById('RacineCarrée');
+                if (!racineEl) return;
+
+                if (isNaN(numberValue)) {
+                    racineEl.textContent = 'Veuillez entrer un nombre valide.';
+                    racineEl.style.color = '#b00';
+                } else if (numberValue < 0) {
+                    racineEl.textContent = 'Le nombre doit être positif pour calculer la racine carrée.';
+                    racineEl.style.color = '#b00';
+                } else {
+                    const racineCarree = Math.sqrt(numberValue);
+                    racineEl.textContent = `La racine carrée de ${numberValue} est ${racineCarree.toFixed(2)}.`;
+                    racineEl.style.color = '#060';
+                }
+            }
+        </script>
+    </body>
+</html>
